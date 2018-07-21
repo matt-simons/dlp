@@ -13,21 +13,15 @@ type Routes []Route
 
 var routes = Routes{
 	Route{
-		"payment",
+		"Contact Support",
 		"",
-		"/hi",
-		MakePayment,
+		"/support",
+		ContactSupport,
 	},
 	Route{
 		"status",
 		"",
 		"/status",
 		Status,
-	},
-	Route{
-		"payment",
-		"",
-		"/{path}",
-		MakePayment,
 	},
 }

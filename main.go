@@ -3,27 +3,19 @@ package main
 import (
 	"net/http"
 	"os"
-
-	log "github.com/Sirupsen/logrus"
+	"log"
 )
 
 func main() {
 	//go memleak()
 
+	// Use aternative port if env variable is set
 	port := ":8000"
 	if p := os.Getenv("PORT"); p != "" {
 		port = p
 	}
 
-	log.SetOutput(os.Stdout)
-
-	logLevel, _ := log.ParseLevel(os.Getenv("LOG"))
-	log.SetLevel(logLevel)
-
-	log.WithFields(log.Fields{
-		"LOG": logLevel,
-	}).Info("LogLevel set")
-
+	// Start server
 	router := NewRouter()
 	log.Fatal(http.ListenAndServe(port, router))
 }

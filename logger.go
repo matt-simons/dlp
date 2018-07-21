@@ -15,7 +15,7 @@ import (
 type MyEntry struct {
 	Method    string
 	Request   string
-	Payload   map[string]interface{}
+	Payload   interface{}
 	Name      string
 	TimeTaken time.Duration
 }
@@ -55,7 +55,7 @@ func Logger(inner http.Handler, name string) http.Handler {
 		formvalues, _ := json.Marshal(r.PostForm)
 
 		buf := new(bytes.Buffer)
-		var redactedForm map[string]interface{}
+		var redactedForm interface{}
 		if len(formvalues) > 0 {
 			mask(buf, dlpClient, "river-direction-210022", string(formvalues), []string{}, "#", 0)
 			json.Unmarshal(buf.Bytes(), &redactedForm)

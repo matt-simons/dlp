@@ -3,9 +3,6 @@ package main
 import (
 	"html/template"
 	"net/http"
-
-	log "github.com/Sirupsen/logrus"
-	"github.com/gorilla/mux"
 )
 
 type ContactDetails struct {
@@ -14,42 +11,28 @@ type ContactDetails struct {
 	Message string
 }
 
-func MakePayment(w http.ResponseWriter, r *http.Request) {
+func ContactSupport(w http.ResponseWriter, r *http.Request) {
+
+	// Load in form template
 	tmpl := template.Must(template.ParseFiles("forms.html"))
+
+	// Show form
 	if r.Method != http.MethodPost {
 		tmpl.Execute(w, nil)
 		return
 	}
 
+	// Get details from submitted form
 	details := ContactDetails{
 		Email:   r.FormValue("email"),
 		Subject: r.FormValue("subject"),
 		Message: r.FormValue("message"),
 	}
 
-	// do something with details
+	// Do something with details
 	_ = details
 
+	// Show success page
 	tmpl.Execute(w, struct{ Success bool }{true})
 }
 
-func ChallengeBan(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func Phishing(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	path := vars["path"]
-
-	err := r.ParseForm()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.WithFields(log.Fields{
-		"path":   path,
-		"method": r.Method,
-		"body":   r.PostForm,
-	}).Info("New phishing attempt made")
-
-}
