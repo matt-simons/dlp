@@ -20,26 +20,28 @@ type MyEntry struct {
 	TimeTaken time.Duration
 }
 
+var projectId = "river-direction-210022"
 var logger *logging.Logger
 var dlpClient *dlp.Client
-var ctx context.Context
 
 func init() {
-	ctx = context.Background()
+	ctx := context.Background()
 
 	// Creates a client.
-	client, err := logging.NewClient(ctx, "river-direction-210022")
+	client, err := logging.NewClient(ctx, projectId)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
+	// Selects the log to write to.
+	logger = client.Logger("blue-green-log")
+
+	// Create Data Loss Protection client
 	dlpClient, err = dlp.NewClient(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Selects the log to write to.
-	logger = client.Logger("blue-green-log")
 }
 
 func Logger(inner http.Handler, name string) http.Handler {
@@ -50,18 +52,21 @@ func Logger(inner http.Handler, name string) http.Handler {
 		// Serve the request
 		inner.ServeHTTP(w, r)
 
-		// Use DLP to mask sensative PII data
+		// Parse data from form to string
 		r.ParseForm()
-		formvalues, _ := json.Marshal(r.PostForm)
+		formEntries, _ := json.Marshal(r.PostForm)
 
+		// Create byte buffer to hold redacted data 
 		buf := new(bytes.Buffer)
 		var redactedForm interface{}
-		if len(formvalues) > 0 {
-			mask(buf, dlpClient, "river-direction-210022", string(formvalues), []string{}, "#", 0)
+
+		if len(formEntries) > 0 {
+			// Use DLP to mask sensative PII data
+			mask(buf, dlpClient, projectId, string(formEntries), []string{}, "#", 0)
 			json.Unmarshal(buf.Bytes(), &redactedForm)
 		}
 
-		// Log the request
+		// Log the request along with redacted data
 		if r.RequestURI != "/status" {
 			logger.Log(logging.Entry{
 				Severity: logging.Info,
