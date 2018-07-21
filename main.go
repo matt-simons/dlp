@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"os"
-	"time"
 
 	log "github.com/Sirupsen/logrus"
 )
