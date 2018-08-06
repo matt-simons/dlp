@@ -13,6 +13,12 @@ type Routes []Route
 
 var routes = Routes{
 	Route{
+		"Homepage",
+		"",
+		"/",
+		Index,
+	},
+	Route{
 		"Contact Support",
 		"",
 		"/support",

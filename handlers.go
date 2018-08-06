@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"net/http"
+	"os"
 )
 
 type ContactDetails struct {
@@ -11,6 +12,19 @@ type ContactDetails struct {
 	Message string
 }
 
+func Index(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "private, no-store")
+
+	// Load in form template
+	tmpl := template.Must(template.ParseFiles("index.html"))
+
+	if len(os.Getenv("AWS")) > 0 {
+		tmpl.Execute(w, struct{ Aws bool }{true})
+		return
+	}
+
+	tmpl.Execute(w, nil)
+}
 func ContactSupport(w http.ResponseWriter, r *http.Request) {
 
 	// Load in form template
@@ -35,4 +49,3 @@ func ContactSupport(w http.ResponseWriter, r *http.Request) {
 	// Show success page
 	tmpl.Execute(w, struct{ Success bool }{true})
 }
-
